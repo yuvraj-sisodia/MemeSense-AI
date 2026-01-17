@@ -56,7 +56,7 @@ async function getRecommendations() {
     }
 
     // Show loading state
-    memeResultsGrid.innerHTML = '<p style="color:var(--text-secondary); text-align:center; width:100%; grid-column: 1/-1;">🧠 AI is searching for memes...</p>';
+    memeResultsGrid.innerHTML = '<p style="color:var(--text-secondary); text-align:center; width:100%; grid-column: 1/-1;">AI is searching for memes...</p>';
 
     try {
         const response = await fetch('/recommend', {
@@ -196,3 +196,43 @@ function reset() {
     confidenceValue.textContent = '0%';
     scanningStatus.style.color = 'var(--text-primary)';
 }
+
+// --- HEALTH CHECK SYSTEM ---
+const statusIndicator = document.getElementById('connectionStatus');
+
+async function checkBackendHealth() {
+    try {
+        // We ping the new /health endpoint
+        // Using a short timeout so we don't wait forever if it's down
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
+
+        const response = await fetch('/health', { signal: controller.signal });
+        
+        if (response.ok) {
+            setOnlineStatus(true);
+        } else {
+            setOnlineStatus(false);
+        }
+    } catch (error) {
+        setOnlineStatus(false);
+    }
+}
+
+function setOnlineStatus(isOnline) {
+    if (isOnline) {
+        statusIndicator.classList.remove('status-offline');
+        statusIndicator.classList.add('status-online');
+        statusIndicator.title = "Backend System: Online";
+    } else {
+        statusIndicator.classList.remove('status-online');
+        statusIndicator.classList.add('status-offline');
+        statusIndicator.title = "Backend System: Offline (Is Flask running?)";
+    }
+}
+
+// Check immediately on load
+checkBackendHealth();
+
+// Optional: Keep checking every 30 seconds
+setInterval(checkBackendHealth, 30000);
