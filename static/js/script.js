@@ -1,3 +1,11 @@
+// --- DOM ELEMENTS ---
+// Tab Buttons
+const tabAnalyze = document.getElementById('tabAnalyze');
+const tabRecommend = document.getElementById('tabRecommend');
+const analyzeView = document.getElementById('analyze-view');
+const recommendView = document.getElementById('recommend-view');
+
+// Analyze View Elements
 const uploadZone = document.getElementById('uploadZone');
 const scanningZone = document.getElementById('scanningZone');
 const resultsZone = document.getElementById('resultsZone');
@@ -11,33 +19,117 @@ const confidenceFill = document.getElementById('confidenceFill');
 const confidenceValue = document.getElementById('confidenceValue');
 const resetButton = document.getElementById('resetButton');
 
+// Search View Elements
+const vibeInput = document.getElementById('vibeInput');
+const memeResultsGrid = document.getElementById('meme-results-grid');
+
 let currentImageSrc = null;
 
-// --- EVENTS ---
-uploadZone.addEventListener('click', () => fileInput.click());
-resetButton.addEventListener('click', reset);
+// --- 1. TAB SWITCHING LOGIC ---
+function switchTab(tabName) {
+    if (tabName === 'analyze') {
+        // Show Analyze, Hide Recommend
+        analyzeView.classList.remove('hidden');
+        recommendView.classList.add('hidden');
+        
+        // Update Buttons
+        tabAnalyze.classList.add('active');
+        tabRecommend.classList.remove('active');
+    } else {
+        // Show Recommend, Hide Analyze
+        analyzeView.classList.add('hidden');
+        recommendView.classList.remove('hidden');
+        
+        // Update Buttons
+        tabAnalyze.classList.remove('active');
+        tabRecommend.classList.add('active');
+    }
+}
 
-fileInput.addEventListener('change', (e) => {
-    if (e.target.files[0]) handleUpload(e.target.files[0]);
-});
+// --- 2. RECOMMENDATION LOGIC (Find Meme) ---
+async function getRecommendations() {
+    const text = vibeInput.value;
+    
+    if(!text) {
+        alert("Please describe a vibe first!");
+        return;
+    }
 
-uploadZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadZone.style.background = 'rgba(255, 255, 255, 0.05)';
-});
+    // Show loading state
+    memeResultsGrid.innerHTML = '<p style="color:var(--text-secondary); text-align:center; width:100%; grid-column: 1/-1;">🧠 AI is searching for memes...</p>';
 
-uploadZone.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    uploadZone.style.background = 'transparent';
-});
+    try {
+        const response = await fetch('/recommend', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({text: text})
+        });
+        
+        const data = await response.json();
+        
+        // Clear grid
+        memeResultsGrid.innerHTML = ''; 
+        
+        if(data.memes && data.memes.length > 0) {
+            data.memes.forEach(meme => {
+                const img = document.createElement('img');
+                img.src = meme.url;
+                img.className = 'meme-thumb';
+                img.alt = meme.name;
+                // Optional: Open image in new tab on click
+                img.onclick = () => window.open(meme.url, '_blank');
+                memeResultsGrid.appendChild(img);
+            });
+        } else {
+            memeResultsGrid.innerHTML = '<p style="text-align:center; width:100%;">No memes found. Try a different vibe!</p>';
+        }
+        
+    } catch (error) {
+        console.error(error);
+        memeResultsGrid.innerHTML = '<p style="color:var(--negative); text-align:center; width:100%;">Error connecting to server.</p>';
+    }
+}
 
-uploadZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadZone.style.background = 'transparent';
-    if (e.dataTransfer.files[0]) handleUpload(e.dataTransfer.files[0]);
-});
+// --- 3. ANALYZE/UPLOAD LOGIC (Original) ---
 
-// --- LOGIC ---
+// Event Listeners for Upload
+if (uploadZone) {
+    uploadZone.addEventListener('click', () => fileInput.click());
+    
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.style.background = 'rgba(255, 255, 255, 0.05)';
+    });
+
+    uploadZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        uploadZone.style.background = 'transparent';
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.style.background = 'transparent';
+        if (e.dataTransfer.files[0]) handleUpload(e.dataTransfer.files[0]);
+    });
+}
+
+if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) handleUpload(e.target.files[0]);
+    });
+}
+
+if (resetButton) {
+    resetButton.addEventListener('click', reset);
+}
+
+// Add 'Enter' key support for search
+if (vibeInput) {
+    vibeInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') getRecommendations();
+    });
+}
+
 function handleUpload(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -48,18 +140,16 @@ function handleUpload(file) {
 }
 
 async function startAnalysis(file) {
-    // 1. UI Transition
+    // UI Transition
     uploadZone.classList.add('hidden');
     scanningZone.classList.remove('hidden');
     scanningImage.src = currentImageSrc;
     scanningStatus.textContent = 'Extracting Text...';
     
-    // 2. Prepare Data
     const formData = new FormData();
     formData.append('image', file);
 
     try {
-        // 3. Send to Python
         const response = await fetch('/analyze', {
             method: 'POST',
             body: formData
@@ -68,7 +158,6 @@ async function startAnalysis(file) {
         if (!response.ok) throw new Error("Server Error");
         const data = await response.json();
 
-        // 4. Show Results
         scanningStatus.textContent = 'Analyzing Vibe...';
         setTimeout(() => displayResults(data), 800);
 

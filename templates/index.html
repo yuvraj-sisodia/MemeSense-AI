@@ -14,7 +14,7 @@
     <header class="header">
         <div class="header-content">
             <div class="logo">MemeSense AI</div>
-            <a href="https://github.com" target="_blank" class="github-icon" aria-label="GitHub">
+            <a href="https://github.com/yuvraj-sisodia/MemeSense-AI" target="_blank" class="github-icon" aria-label="GitHub">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" fill="currentColor"/>
                 </svg>
@@ -24,67 +24,93 @@
 
     <main class="main">
         <section class="hero">
-            <h1 class="hero-title">Decode the Internet's Emotion.</h1>
-            <p class="hero-subtitle">AI-powered sentiment analysis for memes.</p>
+            <h1 class="hero-title">Your Vibe, Visualized.</h1>
+            <p class="hero-subtitle">Don't search by keywords search by feelings. Powered by AI to understand what you really mean.</p>
         </section>
 
         <section class="interaction-zone">
             <div class="glass-card" id="analysisCard">
-                <div class="upload-zone" id="uploadZone">
-                    <input type="file" id="fileInput" accept="image/*" hidden />
-                    <div class="upload-icon">
-                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M32 12V42M32 12L22 22M32 12L42 22M12 52H52M12 32H18M46 32H52" stroke-linecap="round" stroke-linejoin="round"/>
-                            <rect x="8" y="8" width="48" height="48" rx="4" stroke-dasharray="8 8"/>
-                        </svg>
-                    </div>
-                    <p class="upload-text">Drop meme here or click to browse</p>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" id="tabRecommend" onclick="switchTab('recommend')">Find Meme</button>
+                    <button class="tab-btn" id="tabAnalyze" onclick="switchTab('analyze')">Analyze Meme</button>
                 </div>
 
-                <div class="scanning-zone hidden" id="scanningZone">
-                    <div class="scanning-image-container">
-                        <img id="scanningImage" src="" alt="Scanning..." />
-                        <div class="scan-line"></div>
-                    </div>
-                    <p class="scanning-status" id="scanningStatus">Extracting Text...</p>
-                </div>
-
-                <div class="results-zone hidden" id="resultsZone">
-                    <div class="results-layout">
-                        <div class="results-image">
-                            <img id="resultImage" src="" alt="Analyzed meme" />
+                <!--Find MEME-->
+                <div id="recommend-view" class="view-section">
+                    <div class="recommend-layout">
+                        <div class="search-container">
+                            <h3 class="upload-text">Find Memes by Vibe</h3>
+                            <p class="upload-hint" style="margin-bottom: 20px;">Describe your situation, and we'll match the emotion.</p>
+                            
+                            <div class="input-group">
+                                <input type="text" id="vibeInput" class="vibe-input" placeholder="e.g. My code worked on the first try">
+                                <button class="action-button" onclick="getRecommendations()">Search</button>
+                            </div>
                         </div>
-                        <div class="results-data">
-                            <div class="data-section">
-                                <h3 class="data-label">Detected Text</h3>
-                                <div class="text-block" id="detectedText"></div>
+                        <div id="meme-results-grid" class="meme-grid"></div>
+                    </div>
+                </div>
+
+                
+                <!--Analyze MEME-->
+                <div id="analyze-view" class="view-section hidden">
+                    
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3 class="upload-text">Upload Meme</h3>
+                        <p class="upload-hint">AI-powered sentiment analysis for memes, Just drag & drop or click to browse</p>
+                        <input type="file" id="fileInput" hidden accept="image/*">
+                    </div>
+
+                    <div class="scanning-zone hidden" id="scanningZone">
+                        <div class="scanning-image-container">
+                            <img src="" alt="Scanning..." id="scanningImage">
+                            <div class="scan-line"></div>
+                        </div>
+                        <p class="scanning-status" id="scanningStatus">Initializing OCR...</p>
+                    </div>
+
+                    <div class="results-zone hidden" id="resultsZone">
+                        <div class="results-layout">
+                            <div class="results-image">
+                                <img src="" alt="Analyzed Meme" id="resultImage">
                             </div>
-                            <div class="data-section">
-                                <h3 class="data-label">Sentiment</h3>
-                                <span class="sentiment-badge" id="sentimentBadge"></span>
-                            </div>
-                            <div class="data-section">
-                                <h3 class="data-label">Confidence</h3>
-                                <div class="confidence-container">
-                                    <div class="confidence-bar">
-                                        <div class="confidence-fill" id="confidenceFill"></div>
-                                    </div>
-                                    <span class="confidence-value" id="confidenceValue">0%</span>
+                            <div class="results-data">
+                                <div class="data-section">
+                                    <h3 class="data-label">Detected Text</h3>
+                                    <div class="text-block" id="detectedText">
+                                        </div>
                                 </div>
+                                <div class="data-section">
+                                    <h3 class="data-label">Sentiment</h3>
+                                    <span class="sentiment-badge" id="sentimentBadge"></span>
+                                </div>
+                                <div class="data-section">
+                                    <h3 class="data-label">Confidence</h3>
+                                    <div class="confidence-container">
+                                        <div class="confidence-bar">
+                                            <div class="confidence-fill" id="confidenceFill"></div>
+                                        </div>
+                                        <span class="confidence-value" id="confidenceValue">0%</span>
+                                    </div>
+                                </div>
+                                <button class="reset-button" id="resetButton">Analyze Another</button>
                             </div>
-                            <button class="reset-button" id="resetButton">Analyze Another</button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        
-        <footer class="footer">
+
+            </div> </section> <footer class="footer">
             <div class="footer-content">
                 <p class="copyright">&copy; 2026 MemeSense AI</p>
                 <div class="footer-links">
-                    <a href="#" class="footer-link">Privacy</a>
-                    <span class="footer-divider">•</span>
                     <a href="#" class="footer-link">Terms</a>
                 </div>
             </div>

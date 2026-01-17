@@ -34,6 +34,9 @@ body {
   overflow-x: hidden;
 }
 
+/* =========================================
+   HEADER
+   ========================================= */
 .header {
   position: fixed;
   top: 0;
@@ -74,6 +77,9 @@ body {
   transform: translateY(-2px);
 }
 
+/* =========================================
+   MAIN LAYOUT
+   ========================================= */
 .main {
   min-height: 100vh;
   padding: calc(var(--spacing-2xl) + 72px) var(--spacing-md) var(--spacing-2xl);
@@ -110,6 +116,9 @@ body {
   margin: 0 auto;
 }
 
+/* =========================================
+   INTERACTION CARD (GLASS)
+   ========================================= */
 .interaction-zone {
   width: 100%;
   max-width: 1000px;
@@ -125,10 +134,49 @@ body {
   transition: var(--transition);
   min-height: 400px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column; /* Changed to column to stack tabs */
+  align-items: stretch;
 }
 
+/* =========================================
+   TABS NAVIGATION
+   ========================================= */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: var(--spacing-md);
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 100px;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+    color: #000000;
+    background: #FFFFFF;
+    font-weight: 600;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================
+   VIEW 1: UPLOAD & SCAN
+   ========================================= */
 .upload-zone {
   width: 100%;
   text-align: center;
@@ -137,6 +185,7 @@ body {
   border-radius: 16px;
   cursor: pointer;
   transition: var(--transition);
+  margin-top: 20px;
 }
 
 .upload-zone:hover {
@@ -172,6 +221,7 @@ body {
   display: none !important;
 }
 
+/* Scanning Animation */
 .scanning-zone {
   width: 100%;
   display: flex;
@@ -183,16 +233,16 @@ body {
 .scanning-image-container {
   position: relative;
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
   border-radius: 16px;
   overflow: hidden;
+  border: 1px solid var(--glass-border);
 }
 
 .scanning-image-container img {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 16px;
 }
 
 .scan-line {
@@ -200,19 +250,15 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #34C759, transparent);
-  box-shadow: 0 0 20px #34C759;
+  height: 2px;
+  background: #34C759;
+  box-shadow: 0 0 15px #34C759;
   animation: scan 2s ease-in-out infinite;
 }
 
 @keyframes scan {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(400px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(400px); }
 }
 
 .scanning-status {
@@ -223,28 +269,19 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
+/* Results Area */
 .results-zone {
   width: 100%;
   animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .results-layout {
@@ -290,11 +327,14 @@ body {
   font-size: 14px;
   line-height: 1.6;
   color: var(--text-primary);
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .sentiment-badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 10px 20px;
   border-radius: 100px;
   font-size: 16px;
@@ -302,20 +342,9 @@ body {
   width: fit-content;
 }
 
-.sentiment-badge.positive {
-  background: var(--positive);
-  color: #FFFFFF;
-}
-
-.sentiment-badge.negative {
-  background: var(--negative);
-  color: #FFFFFF;
-}
-
-.sentiment-badge.neutral {
-  background: var(--neutral);
-  color: #FFFFFF;
-}
+.sentiment-badge.positive { background: var(--positive); color: #FFF; }
+.sentiment-badge.negative { background: var(--negative); color: #FFF; }
+.sentiment-badge.neutral { background: var(--neutral); color: #FFF; }
 
 .confidence-container {
   display: flex;
@@ -325,7 +354,7 @@ body {
 
 .confidence-bar {
   flex: 1;
-  height: 8px;
+  height: 6px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 100px;
   overflow: hidden;
@@ -333,20 +362,102 @@ body {
 
 .confidence-fill {
   height: 100%;
-  background: linear-gradient(90deg, #34C759, #30D158);
+  background: var(--positive);
   border-radius: 100px;
-  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 1s ease-out;
   width: 0%;
 }
 
 .confidence-value {
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-primary);
   min-width: 50px;
   text-align: right;
 }
 
+/* =========================================
+   VIEW 2: MEME FINDER (New Styles)
+   ========================================= */
+.recommend-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.search-container {
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: var(--spacing-xl);
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px;
+    border-radius: 14px;
+    border: 1px solid var(--glass-border);
+}
+
+.vibe-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 16px;
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+}
+
+.vibe-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.action-button {
+    background: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.action-button:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.meme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.meme-thumb {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.meme-thumb:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Shared Reset Button */
 .reset-button {
   margin-top: var(--spacing-md);
   background: var(--button-bg);
@@ -358,47 +469,35 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
-  font-family: inherit;
+  width: 100%;
 }
 
-.reset-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
-}
-
-.reset-button:active {
-  transform: translateY(0);
-}
+.reset-button:hover { transform: translateY(-2px); }
 
 /* =========================================
    FOOTER
    ========================================= */
 .footer {
   width: 100%;
-  padding: var(--spacing-md) var(--spacing-md);
+  padding: var(--spacing-md);
   border-top: 1px solid var(--glass-border);
-  margin-top: auto; /* Ensures it sits at bottom */
+  margin-top: auto;
   background: rgba(5, 5, 5, 0.5);
   backdrop-filter: blur(10px);
 }
 
 .footer-content {
-  max-width: 1000px; /* Matches your main content width */
+  max-width: 1000px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.copyright {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
+.copyright { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 
 .footer-links {
   display: flex;
-  align-items: center;
   gap: var(--spacing-sm);
 }
 
@@ -408,81 +507,27 @@ body {
   text-decoration: none;
   transition: var(--transition);
 }
+.footer-link:hover { color: var(--text-primary); }
 
-.footer-link:hover {
-  color: var(--text-primary);
-}
-
-.footer-divider {
-  color: var(--glass-border);
-  font-size: 10px;
-}
-
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
 @media (max-width: 768px) {
-  .header {
-    padding: var(--spacing-sm) var(--spacing-md);
+  .hero-title { font-size: 36px; }
+  .glass-card { padding: var(--spacing-md); }
+  
+  .results-layout { grid-template-columns: 1fr; gap: var(--spacing-md); }
+  
+  .meme-grid {
+      grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
   }
-
-  .main {
-    padding: calc(var(--spacing-xl) + 64px) var(--spacing-sm) var(--spacing-xl);
-    gap: var(--spacing-lg);
+  
+  .input-group { flex-direction: column; background: transparent; border: none; padding: 0; }
+  .vibe-input { 
+      background: rgba(255, 255, 255, 0.05); 
+      border-radius: 12px; 
+      border: 1px solid var(--glass-border);
+      margin-bottom: 10px;
   }
-
-  .hero-title {
-    font-size: 36px;
-  }
-
-  .hero-subtitle {
-    font-size: 16px;
-  }
-
-  .glass-card {
-    padding: var(--spacing-md);
-    min-height: 300px;
-  }
-
-  .upload-zone {
-    padding: var(--spacing-xl);
-  }
-
-  .results-layout {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-
-  .results-data {
-    gap: var(--spacing-md);
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-title {
-    font-size: 28px;
-  }
-
-  .hero-subtitle {
-    font-size: 14px;
-  }
-
-  .glass-card {
-    padding: var(--spacing-sm);
-    border-radius: 16px;
-  }
-
-  .upload-zone {
-    padding: var(--spacing-lg);
-  }
-
-  .upload-text {
-    font-size: 16px;
-  }
-
-  .upload-hint {
-    font-size: 12px;
-  }
-
-  .footer-content {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
+  .action-button { width: 100%; }
 }
