@@ -146,25 +146,47 @@ async function startAnalysis(file) {
     scanningImage.src = currentImageSrc;
     scanningStatus.textContent = 'Extracting Text...';
     
-    const formData = new FormData();
-    formData.append('image', file);
-
     try {
-        const response = await fetch('/analyze', {
+        // 1. CLIENT-SIDE OCR with Explicit Paths (The Fix)
+        // We force it to use the same v4 files from the reliable CDN
+        const { data: { text } } = await Tesseract.recognize(
+            file,
+            'eng',
+            { 
+                logger: m => console.log(m),
+                // FORCE THE PATHS so it doesn't get lost looking for unpkg
+                corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@4.0.3/tesseract-core.wasm.js',
+                workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/worker.min.js'
+            }
+        );
+
+        console.log("Extracted Text:", text); // Debugging
+
+        if (!text || !text.trim()) {
+            throw new Error("No readable text found in image.");
+        }
+
+        scanningStatus.textContent = 'Analyzing Sentiment...';
+
+        // 2. Send ONLY the TEXT to the backend
+        const response = await fetch('/analyze_text', {
             method: 'POST',
-            body: formData
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ text: text })
         });
 
         if (!response.ok) throw new Error("Server Error");
         const data = await response.json();
 
-        scanningStatus.textContent = 'Analyzing Vibe...';
         setTimeout(() => displayResults(data), 800);
 
     } catch (error) {
-        console.error(error);
-        scanningStatus.textContent = 'Error: Could not analyze.';
+        console.error("OCR Error:", error);
+        scanningStatus.textContent = 'Error: Could not read text.';
         scanningStatus.style.color = '#FF3B30';
+        
+        // Use a fallback alert so you know exactly what happened
+        alert(`OCR Failed: ${error.message}. Check console for details.`);
     }
 }
 
