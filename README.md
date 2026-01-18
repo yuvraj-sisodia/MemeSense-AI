@@ -122,3 +122,11 @@ MemeSense-AI/
 ├── requirements.txt         # Python Dependencies
 ├── vercel.json              # Deployment Config
 └── README.md                # Documentation
+
+## Privacy & Ethics
+
+This project adheres to a Privacy-First architecture.
+No Image Storage: User images are processed in-memory on the client device and are never transmitted to our servers.
+Data Minimization: Only the extracted text string is sent to the backend for analysis and is discarded immediately after processing.
+
+© 2026 MemeSense AI
