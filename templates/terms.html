@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terms & Privacy - MemeSense AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/png" href="static/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css" />
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" style="text-decoration: none; color: inherit;">
+                <div class="logo">MemeSense AI</div>
+            </a>
+        </div>
+    </header>
+
+    <main class="main" style="align-items: flex-start; padding-top: 120px;">
+        <section class="interaction-zone">
+            <div class="glass-card">
+                
+                <h1 class="hero-title" style="font-size: 40px; text-align: left; margin-bottom: 30px;">Terms & Privacy</h1>
+                
+                <div class="text-content">
+                    <h2>1. Project Purpose</h2>
+                    <p>MemeSense AI is an educational <strong>Minor Project</strong> developed by Data Science students. It demonstrates the application of Natural Language Processing (VADER Sentiment Analysis), Optical Character Recognition (OCR), and Context-Aware API Routing. It is not a commercial product.</p>
+
+                    <h2>2. Privacy & Data Handling (Important)</h2>
+                    <p>We operate on a <strong>Privacy-First Architecture</strong>. Here is exactly how your data is handled:</p>
+                    <ul>
+                        <li><strong>Image Processing:</strong> All OCR (Text Extraction) happens <strong>Client-Side</strong> in your browser using <code>Tesseract.js</code>. Your images are processed in your device's RAM and are <strong>never uploaded</strong> to our servers.</li>
+                        <li><strong>Text Analysis:</strong> Only the extracted text (strings) is sent to our backend for Sentiment Analysis. This text is processed in real-time and is not stored in any database.</li>
+                        <li><strong>No Cookies:</strong> We do not use cookies or tracking pixels.</li>
+                    </ul>
+
+                    <h2>3. Content Sources</h2>
+                    <p>Meme search results are fetched dynamically from the public <strong>Reddit API</strong> via <code>meme-api.com</code>. We do not host or own any meme images. Content is subject to the availability and moderation of the respective Subreddits (e.g., <em>r/ProgrammerHumor, r/wholesomememes</em>).</p>
+
+                    <h2>4. Limitation of Liability</h2>
+                    <p>This tool is for demonstration purposes only. The sentiment analysis AI (VADER) is probabilistic and may occasionally misinterpret sarcasm or complex context. We are not responsible for the content of memes fetched from third-party APIs.</p>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <a href="/" class="action-button" style="text-decoration: none; display: inline-block;">← Back to Home</a>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="copyright">&copy; 2026 MemeSense AI</p>
+        </div>
+    </footer>
+</body>
+</html>

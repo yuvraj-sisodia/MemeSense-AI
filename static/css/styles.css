@@ -533,6 +533,36 @@ body {
 }
 .footer-link:hover { color: var(--text-primary); }
 
+/* Styling for the Terms Page Text */
+.text-content h2 {
+    color: var(--text-primary);
+    margin-top: 32px;
+    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.text-content p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.text-content ul {
+    margin-left: 20px;
+    margin-bottom: 24px;
+    color: var(--text-secondary);
+}
+
+.text-content li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.text-content strong {
+    color: var(--text-primary);
+}
 /* =========================================
    MOBILE RESPONSIVENESS
    ========================================= */
