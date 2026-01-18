@@ -1,17 +1,24 @@
 from flask import Flask, render_template, request, jsonify
 import nltk
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import os
+
+# --- FIX: NLTK SETUP FOR VERCEL ---
+nltk.data.path.append("/tmp")
+
+# Try to load VADER. If it fails, download it to /tmp
+try:
+    from nltk.sentiment.vader import SentimentIntensityAnalyzer
+    analyzer = SentimentIntensityAnalyzer()
+except (LookupError, OSError):
+    print("Downloading VADER to /tmp...")
+    nltk.download('vader_lexicon', download_dir='/tmp')
+    from nltk.sentiment.vader import SentimentIntensityAnalyzer
+    analyzer = SentimentIntensityAnalyzer()
+
 import requests
 import random
 
 app = Flask(__name__)
-
-# --- INITIALIZE VADER (The Brain) ---
-try:
-    analyzer = SentimentIntensityAnalyzer()
-except LookupError:
-    nltk.download('vader_lexicon')
-    analyzer = SentimentIntensityAnalyzer()
 
 # --- LOGIC: REDDIT MEME FETCHING ---
 def get_memes_by_sentiment(sentiment_score, user_text):
@@ -35,22 +42,18 @@ def get_memes_by_sentiment(sentiment_score, user_text):
 
         # Priority 2: Sentiment Vibe
         elif sentiment_score >= 0.2:
-            # Positive Vibe -> Wholesome content
             subreddit = "wholesomememes"
         elif sentiment_score <= -0.2:
-            # Negative Vibe -> Relatable struggle memes
             subreddit = "2meirl4meirl"
         else:
-            # Neutral/Random -> Relatable general content
             subreddit = "me_irl"
 
-        # 2. Fetch 50 memes from that subreddit
-        # API: https://meme-api.com/gimme/{subreddit}/{count}
+        # 2. Fetch 50 memes
         url = f"https://meme-api.com/gimme/{subreddit}/50"
         response = requests.get(url, timeout=5).json()
         memes = response.get('memes', [])
 
-        # 3. Filter out NSFW (Safety First for College Project!)
+        # 3. Filter out NSFW
         safe_memes = [m for m in memes if not m.get('nsfw', False)]
 
         # 4. Return Top 6 matches
@@ -74,18 +77,15 @@ def health():
 def terms():
     return render_template('terms.html')
 
-# 1. FIND MEME ROUTE (Reddit Version)
 @app.route('/recommend', methods=['POST'])
 def recommend():
     try:
         data = request.json
         user_text = data.get('text', '')
         
-        # Get Score
         scores = analyzer.polarity_scores(user_text)
         compound = scores['compound']
         
-        # Get Memes
         recommended_memes = get_memes_by_sentiment(compound, user_text)
         
         return jsonify({ 
@@ -96,7 +96,6 @@ def recommend():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# 2. ANALYZE MEME ROUTE (Text Version for Client-Side OCR)
 @app.route('/analyze_text', methods=['POST'])
 def analyze_text():
     try:
@@ -113,7 +112,6 @@ def analyze_text():
         elif compound <= -0.05: sentiment = "negative"
         else: sentiment = "neutral"
 
-        # Calculate logical confidence
         confidence = int(abs(compound) * 100)
         confidence = min(confidence + 15, 99) if confidence > 0 else 90
 
