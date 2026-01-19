@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import nltk
 import os
 
-# --- FIX: NLTK SETUP FOR VERCEL ---
+# --- NLTK SETUP FOR VERCEL ---
 nltk.data.path.append("/tmp")
 
 # Try to load VADER. If it fails, download it to /tmp
